@@ -27,6 +27,9 @@ var DEFAULT_OPTIONS = {
      * @type {Number}
      */
     iconSize: 24,
+
+    // path
+    ironIconsetSvgPath: '../iron-iconset-svg/iron-iconset-svg.html',
 };
 
 function polymerIconset(options) {
@@ -36,10 +39,10 @@ function polymerIconset(options) {
     _.defaults(options, DEFAULT_OPTIONS);
 
     // check for required options
-    if (!options.iconSetName) {
+    if (!options.iconsetName) {
         throw new gulpUtil.PluginError(
             'gulp-polymer-iconset',
-            'iconSetName option is required'
+            'iconsetName option is required'
         );
     }
 
@@ -119,7 +122,7 @@ function polymerIconset(options) {
 
         // create the file object
         var file = new gulpUtil.File({
-            path: options.iconSetName + '.html',
+            path: options.iconsetName + '.html',
             contents: new Buffer(iconSetHtml),
         });
 
