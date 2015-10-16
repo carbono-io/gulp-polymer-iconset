@@ -27,12 +27,6 @@ var DEFAULT_OPTIONS = {
      * @type {Number}
      */
     iconSize: 24,
-
-    /**
-     * The selector to be used to retrieve the svg for the icon
-     * @type {String}
-     */
-    // iconSelector: 'svg > g',
 };
 
 function polymerIconset(options) {
