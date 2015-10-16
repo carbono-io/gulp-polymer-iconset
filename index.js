@@ -13,10 +13,26 @@ var renderIconSetHtml   = _.template(iconSetTemplate);
 
 // default values for options
 var DEFAULT_OPTIONS = {
-    iconName: function (file) {
+    /**
+     * Name to be given to the icon
+     * @param  {Vinyl} file
+     * @return {String}     the id of the icon
+     */
+    iconId: function (file) {
         return path.basename(file.path, '.svg');
     },
+
+    /**
+     * Size
+     * @type {Number}
+     */
     iconSize: 24,
+
+    /**
+     * The selector to be used to retrieve the svg for the icon
+     * @type {String}
+     */
+    // iconSelector: 'svg > g',
 };
 
 function polymerIconset(options) {
@@ -28,7 +44,7 @@ function polymerIconset(options) {
     // check for required options
     if (!options.iconSetName) {
         throw new gulpUtil.PluginError(
-            'gulp-polymerize-svg',
+            'gulp-polymer-iconset',
             'iconSetName option is required'
         );
     }
@@ -38,32 +54,59 @@ function polymerIconset(options) {
 
     function bufferContents(file, encoding, cb) {
 
+        // evaluate options according to file
+        var iconId = (typeof options.iconId === 'function') ? 
+            options.iconId(file) : options.iconId;
+        var iconSelector = (typeof options.iconSelector === 'function') ? 
+            options.iconSelector(file) : options.iconSelector;
+
         if (file.isNull()) {
             // return empty file
             return cb(null, file);
         }
 
         if (file.isBuffer()) {
+            // var to hold the icon svg string
+            var svgStr = '\n<!-- ' + iconId + ' -->\n';
 
-            var stringFileContents = file.contents.toString(encoding);
-
-            // retrieve the iconSvgString
-            var $ = cheerio.load(stringFileContents, {
+            // build a cheerio dom
+            var $ = cheerio.load(file.contents.toString(encoding), {
                 xmlMode: true
             });
 
-            var iconNode = $('svg > g');
+            // find the svg node
+            var svgNode = $('svg');
 
-            // give id to the iconNode
-            var id = options.iconName(file);
-            iconNode.attr('id', id);
+            // check if the icon is made of multiple nodes
+            var svgNodeContents = svgNode.children();
 
-            // add it to the full string
-            iconsSvgString += '\n' + $.xml(iconNode);
+            if (svgNodeContents.length === 1 && $(svgNodeContents[0]).is('g')) {
+                // the icon is ready to be added to the iconset file
+
+                // give id to the iconNode
+                $(svgNodeContents[0]).attr('id', iconId);
+
+                svgStr += $.xml(svgNodeContents[0]);
+            } else {
+                // the icon is not ready to be added,
+                // we must wrap it with an 'g' (group) tag
+                // before adding
+
+                svgStr += '<g id="' + iconId + '">\n' + $.xml(svgNodeContents) + '\n</g>';
+            }
+
+            // add finishing comment
+            svgStr += '\n<!-- ' + iconId + ' -->\n'
+
+            // add it to the full iconset icons string
+            iconsSvgString += svgStr;
         }
 
         if (file.isStream()) {
-            throw new gulpUtil.PluginError('gulp-polymerize-svg', 'streams not currently supported');
+            throw new gulpUtil.PluginError(
+                'gulp-polymer-iconset',
+                'streams not currently supported'
+            );
         }
 
         // invoke callback and pass no files
