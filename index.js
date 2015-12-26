@@ -39,10 +39,10 @@ function polymerIconset(options) {
     _.defaults(options, DEFAULT_OPTIONS);
 
     // check for required options
-    if (!options.iconsetName) {
+    if (!options.iconSetName) {
         throw new gulpUtil.PluginError(
             'gulp-polymer-iconset',
-            'iconsetName option is required'
+            'iconSetName option is required'
         );
     }
 
@@ -52,9 +52,9 @@ function polymerIconset(options) {
     function bufferContents(file, encoding, cb) {
 
         // evaluate options according to file
-        var iconId = (typeof options.iconId === 'function') ? 
+        var iconId = (typeof options.iconId === 'function') ?
             options.iconId(file) : options.iconId;
-        var iconSelector = (typeof options.iconSelector === 'function') ? 
+        var iconSelector = (typeof options.iconSelector === 'function') ?
             options.iconSelector(file) : options.iconSelector;
 
         if (file.isNull()) {
@@ -122,7 +122,7 @@ function polymerIconset(options) {
 
         // create the file object
         var file = new gulpUtil.File({
-            path: options.iconsetName + '.html',
+            path: options.iconSetName + '.html',
             contents: new Buffer(iconSetHtml),
         });
 
