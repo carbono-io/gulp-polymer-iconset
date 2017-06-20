@@ -4,14 +4,15 @@ Gulp plugin that generates an `<iron-iconset-svg>` given a group of .svg icon fi
 ## Usage
 
 Install it with npm
-    
+
     npm install gulp-polymer-iconset
 
 In your <code>gulpfile.js</code>:
 
 ```javascript
-var polymerIconset = require('gulp-polymer-iconset'),
-    rename = require('gulp-rename');
+var gulp = require('gulp'),
+    polymerIconset = require('gulp-polymer-iconset'),
+    path = require('path');
 
 gulp.task('styles', function(){
   return gulp.src('app/icons/**/*')
@@ -19,7 +20,7 @@ gulp.task('styles', function(){
         iconSetName: 'my-icons',
         iconSize: 18,
         iconId: function (file) {
-            return 'my-icons' + ':' + path.basename(file.path, '.svg');
+            return path.basename(file.path, '.svg');
         },
     }))
     .pipe(gulp.dest('app/iconsets'));
@@ -34,7 +35,7 @@ It results in:
 <iron-iconset-svg name="my-icons" size="18">
   <svg>
     <defs>
-        
+
 <!-- my-icons:icon-01 -->
 <g id="my-icons:icon-01">
   <polygon points="..."/>
